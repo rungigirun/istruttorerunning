@@ -28,8 +28,8 @@
               black: '#070707',
               card: '#121212',
               border: '#242424',
-              neon: '#FF6B00',      /* Arancione Fluo */
-              neonDark: '#E05E00',  /* Arancione Scuro hover */
+              neon: '#FF6B00',
+              neonDark: '#E05E00',
               muted: '#8E8E93',
             }
           }
@@ -72,4 +72,32 @@
           <p class="text-[10px] text-brand-muted tracking-widest uppercase font-mono mt-0.5">Istruttore Running</p>
         </div>
       </div>
-      <div id="userBadge" class="
+      <div id="userBadge" class="hidden items-center gap-2">
+        <span id="roleTag" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-brand-card border border-brand-border text-brand-neon"></span>
+        <button onclick="handleLogout()" class="p-2 text-brand-muted hover:text-white transition" title="Logout">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW AREA -->
+    <main class="flex-1 p-4 pb-10">
+
+      <!-- AUTH CONTAINER -->
+      <section id="authSection" class="flex flex-col justify-center min-h-[75vh]">
+        <div class="text-center mb-8">
+          <h2 id="authTitle" class="text-2xl font-black uppercase italic tracking-wide">Gestione Allenamenti</h2>
+          <p class="text-xs text-brand-muted mt-1">Accedi o registrati per pianificare le sessioni</p>
+        </div>
+
+        <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase font-mono text-brand-muted mb-1">Email</label>
+            <input type="email" id="authEmail" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-neon transition" placeholder="atleta@rungigirun.it">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase font-mono text-brand-muted mb-1">Password</label>
+            <div class="relative">
+              <input type="password" id="authPassword" required class="w-full bg-brand-card border border-brand-border rounded-xl pl-4 pr-11 py-3 text-sm focus:outline-none focus:border-brand-neon transition" placeholder="••••••••">
+              <button type="button" onclick="togglePasswordVisibility()"
