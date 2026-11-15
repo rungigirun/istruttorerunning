@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>rungigirun - Gestione Allenamenti</title>
   
-  <!-- iOS / Safari Web App Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="rungigirun">
   
-  <!-- Tailwind CSS & Lucide Icons -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Firebase SDKs (v9 Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -74,8 +72,8 @@
       </div>
       <div id="userBadge" class="hidden items-center gap-2">
         <span id="roleTag" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-brand-card border border-brand-border text-brand-neon"></span>
-        <button onclick="handleLogout()" class="p-2 text-brand-muted hover:text-white transition" title="Logout">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
+        <button onclick="handleLogout()" class="px-3 py-1.5 text-xs bg-brand-card border border-brand-border text-brand-muted hover:text-white rounded-lg transition font-mono">
+          Esci
         </button>
       </div>
     </header>
@@ -99,9 +97,9 @@
           <div>
             <label class="block text-xs uppercase font-mono text-brand-muted mb-1">Password</label>
             <div class="relative">
-              <input type="password" id="authPassword" required class="w-full bg-brand-card border border-brand-border rounded-xl pl-4 pr-11 py-3 text-sm focus:outline-none focus:border-brand-neon transition" placeholder="••••••••">
-              <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-white transition p-1">
-                <i id="togglePasswordIcon" data-lucide="eye" class="w-4 h-4"></i>
+              <input type="password" id="authPassword" required class="w-full bg-brand-card border border-brand-border rounded-xl pl-4 pr-16 py-3 text-sm focus:outline-none focus:border-brand-neon transition" placeholder="••••••••">
+              <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-brand-muted hover:text-white transition py-1 px-2">
+                Mostra
               </button>
             </div>
             <div class="flex justify-end mt-1">
@@ -137,4 +135,481 @@
             </div>
           </div>
 
-          <button type="submit" id="authSubmitBtn" class="w-full bg-brand-neon hover:bg-brand-neonDark text-black font-black uppercase py-3
+          <button type="submit" id="authSubmitBtn" class="w-full bg-brand-neon hover:bg-brand-neonDark text-black font-black uppercase py-3.5 rounded-xl transition shadow-[0_0_20px_rgba(255,107,0,0.3)] tracking-wider mt-2">
+            Accedi
+          </button>
+        </form>
+
+        <div class="text-center mt-6 space-y-3">
+          <div>
+            <button type="button" onclick="toggleAuthMode()" id="authToggleBtn" class="text-xs text-brand-muted hover:text-white underline font-mono">
+              Non hai un account? Registrati
+            </button>
+          </div>
+          <div>
+            <button type="button" onclick="forceCleanLogout()" class="text-[10px] text-red-500/70 hover:text-red-400 font-mono underline">
+              Se la pagina è bloccata: Clicca qui per sbloccare
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- COACH DASHBOARD -->
+      <section id="coachDashboard" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-black uppercase italic">Dashboard Coach</h2>
+          <p class="text-xs text-brand-muted">Assegna e monitora gli allenamenti</p>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">I Tuoi Atleti Registrati</h3>
+            <button onclick="loadAthletesList()" class="text-[11px] text-brand-muted hover:text-white underline font-mono">Aggiorna</button>
+          </div>
+          <div id="athletesListContainer" class="flex flex-wrap gap-2 pt-1">
+            <p class="text-xs text-brand-muted italic">Caricamento atleti...</p>
+          </div>
+        </div>
+
+        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
+          <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Nuovo Allenamento</h3>
+          
+          <form onsubmit="handleCreateWorkout(event)" class="space-y-3">
+            <div>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Email Atleta Destinatario</label>
+              <input type="email" id="workoutAthleteEmail" placeholder="atleta@email.it" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Tipo Sessione</label>
+                <select id="workoutType" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+                  <option value="Ripetute">Ripetute / Interval</option>
+                  <option value="Fondo Lento">Fondo Lento (FL)</option>
+                  <option value="Tempo Run">Tempo Run / Medio</option>
+                  <option value="Long Run">Long Run / Lunghissimo</option>
+                  <option value="Gara">Test / Gara</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Data Esecuzione</label>
+                <input type="date" id="workoutDate" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione (es. 10km Fondo Lento)</label>
+              <input type="text" id="workoutTitle" placeholder="es. 10km Fondo Lento" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli Sessione</label>
+              <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'30/km con rec 1'30 deambulato + 2km defaticamento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+              Invia Allenamento
+            </button>
+          </form>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Allenamenti Divisi per Atleta e Settimana</h3>
+          <div id="coachWorkoutsList" class="space-y-4">
+            <p class="text-xs text-brand-muted italic text-center py-4">Caricamento allenamenti...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ATHLETE DASHBOARD -->
+      <section id="athleteDashboard" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-black uppercase italic">I Tuoi Allenamenti</h2>
+          <p class="text-xs text-brand-muted">Pianificazione divisa per settimana con contachilometri</p>
+        </div>
+
+        <div id="athleteWorkoutsList" class="space-y-6">
+          <p class="text-xs text-brand-muted italic text-center py-4">Caricamento scheda...</p>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MAIN JS APP LOGIC -->
+  <script>
+    const COACH_PIN = "GIGI2026";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-pFIDIDdz4w5KeSOQjedmp9VLUPXfs88",
+      authDomain: "rungigirun-de040.firebaseapp.com",
+      projectId: "rungigirun-de040",
+      storageBucket: "rungigirun-de040.firebasestorage.app",
+      messagingSenderId: "443483989504",
+      appId: "1:443483989504:web:a193c118ab58c5177adae5",
+      measurementId: "G-T47KNG4E5J"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let isSignUpMode = false;
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateEl = document.getElementById('workoutDate');
+      if (dateEl) dateEl.valueAsDate = new Date();
+    });
+
+    window.forceCleanLogout = function() {
+      try {
+        auth.signOut().finally(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+          showAuth();
+          alert("Sessione resettata con successo!");
+        });
+      } catch (e) {
+        showAuth();
+      }
+    };
+
+    window.toggleAuthMode = function() {
+      isSignUpMode = !isSignUpMode;
+      const title = document.getElementById('authTitle');
+      const submitBtn = document.getElementById('authSubmitBtn');
+      const toggleBtn = document.getElementById('authToggleBtn');
+      const roleGroup = document.getElementById('roleSelectorGroup');
+
+      if (isSignUpMode) {
+        if (title) title.innerText = 'Registrazione';
+        if (submitBtn) submitBtn.innerText = 'Registrati';
+        if (toggleBtn) toggleBtn.innerText = 'Hai già un account? Accedi';
+        if (roleGroup) roleGroup.classList.remove('hidden');
+        handleRoleChange();
+      } else {
+        if (title) title.innerText = 'Accedi';
+        if (submitBtn) submitBtn.innerText = 'Accedi';
+        if (toggleBtn) toggleBtn.innerText = 'Non hai un account? Registrati';
+        if (roleGroup) roleGroup.classList.add('hidden');
+      }
+    };
+
+    window.handleRoleChange = function() {
+      const selectedRole = document.querySelector('input[name="userRole"]:checked')?.value;
+      const pinGroup = document.getElementById('coachPinGroup');
+      if (pinGroup) {
+        if (selectedRole === 'coach') {
+          pinGroup.classList.remove('hidden');
+        } else {
+          pinGroup.classList.add('hidden');
+        }
+      }
+    };
+
+    window.togglePasswordVisibility = function() {
+      const passwordInput = document.getElementById('authPassword');
+      if (!passwordInput) return;
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+      } else {
+        passwordInput.type = 'password';
+      }
+    };
+
+    window.handleForgotPassword = async function() {
+      const email = document.getElementById('authEmail').value.trim();
+      if (!email) {
+        alert("Inserisci prima la tua email nel campo in alto, poi clicca su 'Password dimenticata?'");
+        return;
+      }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        alert("Email inviata! Controlla la tua casella di posta per reimpostare la password.");
+      } catch (err) {
+        alert("Errore invio email: " + err.message);
+      }
+    };
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          const role = userDoc.exists ? userDoc.data().role : 'athlete';
+          showDashboard(role);
+        } catch (e) {
+          showDashboard('athlete');
+        }
+      } else {
+        currentUser = null;
+        showAuth();
+      }
+    });
+
+    window.handleAuthSubmit = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
+      const password = document.getElementById('authPassword').value;
+
+      try {
+        if (isSignUpMode) {
+          const roleElement = document.querySelector('input[name="userRole"]:checked');
+          const role = roleElement ? roleElement.value : 'athlete';
+          
+          if (role === 'coach') {
+            const enteredPin = document.getElementById('coachPinInput').value.trim();
+            if (enteredPin !== COACH_PIN) {
+              alert("Codice Segreto Coach Errato! Impossibile registrarsi come Coach.");
+              return;
+            }
+          }
+
+          const cred = await auth.createUserWithEmailAndPassword(email, password);
+          await db.collection('users').doc(cred.user.uid).set({
+            email: email,
+            role: role,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          await auth.signInWithEmailAndPassword(email, password);
+        }
+      } catch (err) {
+        alert("Errore Autenticazione: " + err.message);
+      }
+    };
+
+    window.handleLogout = function() {
+      auth.signOut().then(() => {
+        showAuth();
+      });
+    };
+
+    function showDashboard(role) {
+      const authSec = document.getElementById('authSection');
+      const coachDash = document.getElementById('coachDashboard');
+      const athleteDash = document.getElementById('athleteDashboard');
+      
+      if (authSec) authSec.classList.add('hidden');
+      
+      const badge = document.getElementById('userBadge');
+      if (badge) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      }
+      const roleTag = document.getElementById('roleTag');
+      if (roleTag) roleTag.innerText = role;
+
+      if (role === 'coach') {
+        if (coachDash) coachDash.classList.remove('hidden');
+        if (athleteDash) athleteDash.classList.add('hidden');
+        loadCoachWorkouts();
+        loadAthletesList();
+      } else {
+        if (athleteDash) athleteDash.classList.remove('hidden');
+        if (coachDash) coachDash.classList.add('hidden');
+        loadAthleteWorkouts();
+      }
+    }
+
+    function showAuth() {
+      const authSec = document.getElementById('authSection');
+      const coachDash = document.getElementById('coachDashboard');
+      const athleteDash = document.getElementById('athleteDashboard');
+      
+      if (authSec) authSec.classList.remove('hidden');
+      if (coachDash) coachDash.classList.add('hidden');
+      if (athleteDash) athleteDash.classList.add('hidden');
+      
+      const badge = document.getElementById('userBadge');
+      if (badge) badge.classList.add('hidden');
+    }
+
+    function formatDateIt(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      if (isNaN(d.getTime())) return dateStr;
+      
+      const options = { day: 'numeric', month: 'short', year: 'numeric' };
+      return d.toLocaleDateString('it-IT', options);
+    }
+
+    window.loadAthletesList = function() {
+      const container = document.getElementById('athletesListContainer');
+      if (!container) return;
+
+      db.collection('users')
+        .where('role', '==', 'athlete')
+        .get()
+        .then((snapshot) => {
+          if (snapshot.empty) {
+            container.innerHTML = '<p class="text-xs text-brand-muted italic">Nessun atleta registrato al momento.</p>';
+            return;
+          }
+          let html = '';
+          snapshot.forEach((docSnap) => {
+            const athlete = docSnap.data();
+            const docId = docSnap.id;
+            const email = athlete.email || 'Senza email';
+            html += `
+              <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#070707] border border-brand-border text-xs text-white font-mono">
+                <button type="button" onclick="selectAthleteEmail('${email}')" class="hover:text-brand-neon transition flex items-center gap-1.5">
+                  <span>🏃‍♂️ ${email}</span>
+                </button>
+                <button type="button" onclick="deleteAthleteProfile('${docId}', '${email}')" class="ml-1 text-red-400 hover:text-red-300 p-1 font-bold" title="Elimina">✕</button>
+              </div>
+            `;
+          });
+          container.innerHTML = html;
+        })
+        .catch((err) => {
+          console.error("Errore caricamento atleti:", err);
+          container.innerHTML = '<p class="text-xs text-red-400">Errore nel caricamento atleti.</p>';
+        });
+    };
+
+    window.deleteAthleteProfile = async function(docId, email) {
+      if (confirm(`Vuoi rimuovere il profilo di ${email} dalla lista atleti?`)) {
+        try {
+          await db.collection('users').doc(docId).delete();
+          alert("Atleta rimosso con successo dalla lista.");
+          loadAthletesList();
+        } catch (err) {
+          alert("Errore durante la rimozione: " + err.message);
+        }
+      }
+    };
+
+    window.selectAthleteEmail = function(email) {
+      const emailInput = document.getElementById('workoutAthleteEmail');
+      if (emailInput) {
+        emailInput.value = email;
+        emailInput.focus();
+      }
+    };
+
+    window.handleCreateWorkout = async function(e) {
+      e.preventDefault();
+      try {
+        await db.collection('workouts').add({
+          athleteEmail: document.getElementById('workoutAthleteEmail').value.trim().toLowerCase(),
+          coachUid: currentUser.uid,
+          type: document.getElementById('workoutType').value,
+          date: document.getElementById('workoutDate').value,
+          title: document.getElementById('workoutTitle').value,
+          details: document.getElementById('workoutDetails').value,
+          status: 'assigned',
+          feedback: null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Allenamento inviato con successo!');
+        e.target.reset();
+        document.getElementById('workoutDate').valueAsDate = new Date();
+      } catch (err) {
+        alert("Errore invio: " + err.message);
+      }
+    };
+
+    function getMondayDate(dateStr) {
+      if (!dateStr) return null;
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return null;
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const dayNum = parseInt(parts[2], 10);
+      
+      const d = new Date(year, month, dayNum);
+      if (isNaN(d.getTime())) return null;
+
+      const dayOfWeek = d.getDay();
+      const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+      
+      const monday = new Date(d.setDate(diff));
+      monday.setHours(0, 0, 0, 0);
+      return monday;
+    }
+
+    function formatWeekLabel(mondayDate) {
+      const sunday = new Date(mondayDate);
+      sunday.setDate(mondayDate.getDate() + 6);
+
+      const options = { day: 'numeric', month: 'short', year: 'numeric' };
+      return `Settimana: ${mondayDate.toLocaleDateString('it-IT', options)} -${sunday.toLocaleDateString('it-IT', options)}`;
+    }
+
+    function extractKilometers(text) {
+      if (!text) return 0;
+      const match = text.match(/(\d+([.,]\d+)?)\s*(km|chilometri)/i);
+      if (match) {
+        return parseFloat(match[1].replace(',', '.'));
+      }
+      return 0;
+    }
+
+    function loadCoachWorkouts() {
+      const container = document.getElementById('coachWorkoutsList');
+      if (!container) return;
+
+      db.collection('workouts').where('coachUid', '==', currentUser.uid).onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessun allenamento inviato.</p>';
+          return;
+        }
+
+        const athletesMap = {};
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const email = (data.athleteEmail || 'Senza Email').toLowerCase();
+          if (!athletesMap[email]) {
+            athletesMap[email] = [];
+          }
+          athletesMap[email].push({ id: doc.id, ...data });
+        });
+
+        let html = '';
+        for (const [athleteEmail, workouts] of Object.entries(athletesMap)) {
+          workouts.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+          const weeksMap = new Map();
+          workouts.forEach(w => {
+            const monday = getMondayDate(w.date);
+            const key = monday ? monday.getTime() : 0;
+            if (!weeksMap.has(key)) {
+              weeksMap.set(key, { mondayDate: monday, workouts: [] });
+            }
+            weeksMap.get(key).workouts.push(w);
+          });
+
+          const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
+
+          html += `
+            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
+              <div class="flex items-center justify-between border-b border-brand-border pb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-neon font-mono">
+                  🏃‍♂️ ${athleteEmail}
+                </span>
+                <span class="text-[10px] font-mono bg-[#070707] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">
+                  ${workouts.length} sessioni
+                </span>
+              </div>
+              <div class="space-y-4">
+          `;
+
+          sortedWeekKeys.forEach(weekKey => {
+            const weekData = weeksMap.get(weekKey);
+            const weekTitle = weekData.mondayDate ? formatWeekLabel(weekData.mondayDate) : 'Altre date';
+            const weekWorkouts = weekData.workouts;
+
+            let totalKm = 0;
+            weekWorkouts.forEach(w => {
+              totalKm += extractKilometers(w.title) + extractKilometers(w.details);
+            });
+
+            html += `
+              <div class="bg
