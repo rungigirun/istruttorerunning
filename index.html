@@ -450,7 +450,7 @@
       return d.toLocaleDateString('it-IT', options);
     }
 
-    // CARICAMENTO E SELEZIONE ATLETI PER COACH
+    // CARICAMENTO E PULIZIA LISTA ATLETI PER COACH
     window.loadAthletesList = function() {
       const container = document.getElementById('athletesListContainer');
       if (!container) return;
@@ -464,20 +464,41 @@
             return;
           }
           let html = '';
-          snapshot.forEach((doc) => {
-            const athlete = doc.data();
+          snapshot.forEach((docSnap) => {
+            const athlete = docSnap.data();
+            const docId = docSnap.id;
+            const email = athlete.email || 'Senza email';
             html += `
-              <button type="button" onclick="selectAthleteEmail('${athlete.email}')" class="px-2.5 py-1.5 rounded-lg bg-[#070707] border border-brand-border hover:border-brand-neon text-xs text-white font-mono flex items-center gap-1.5 transition">
-                <span>🏃‍♂️ ${athlete.email}</span>
-              </button>
+              <div class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#070707] border border-brand-border text-xs text-white font-mono">
+                <button type="button" onclick="selectAthleteEmail('${email}')" class="hover:text-brand-neon transition flex items-center gap-1.5">
+                  <span>🏃‍♂️ ${email}</span>
+                </button>
+                <button type="button" onclick="deleteAthleteProfile('${docId}', '${email}')" class="ml-1 text-red-400 hover:text-red-300 p-0.5" title="Elimina atleta dalla lista">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
             `;
           });
           container.innerHTML = html;
+          lucide.createIcons();
         })
         .catch((err) => {
           console.error("Errore caricamento atleti:", err);
           container.innerHTML = '<p class="text-xs text-red-400">Errore nel caricamento atleti.</p>';
         });
+    };
+
+    // ELIMINA PROFILO ATLETA DA FIRESTORE
+    window.deleteAthleteProfile = async function(docId, email) {
+      if (confirm(`Vuoi rimuovere il profilo di ${email} dalla lista atleti?`)) {
+        try {
+          await db.collection('users').doc(docId).delete();
+          alert("Atleta rimosso con successo dalla lista.");
+          loadAthletesList();
+        } catch (err) {
+          alert("Errore durante la rimozione: " + err.message);
+        }
+      }
     };
 
     window.selectAthleteEmail = function(email) {
@@ -605,7 +626,7 @@
       const d = new Date(year, month, dayNum);
       if (isNaN(d.getTime())) return null;
 
-      const dayOfWeek = d.getDay(); // 0 è domenica, 1 è lunedì, ecc.
+      const dayOfWeek = d.getDay();
       const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
       
       const monday = new Date(d.setDate(diff));
@@ -651,14 +672,12 @@
           return;
         }
 
-        // 1. Ordina tutti i workout in ordine cronologico reale (dal meno recente al più recente)
         allWorkouts.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           return dateA - dateB;
         });
 
-        // 2. Raggruppa per chiave del lunedì
         const weeksMap = new Map();
         
         allWorkouts.forEach(w => {
@@ -674,7 +693,6 @@
           weeksMap.get(key).workouts.push(w);
         });
 
-        // 3. Ordina i blocchi di settimane cronologicamente
         const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
 
         let html = '';
