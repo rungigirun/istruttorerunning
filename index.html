@@ -36,24 +36,8 @@
       }
     }
   </script>
-  <style>
-    body {
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #121212;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #242424;
-      border-radius: 4px;
-    }
-  </style>
 </head>
-<body class="h-full text-white font-sans antialiased bg-[#070707] flex flex-col justify-between custom-scrollbar">
+<body class="h-full text-white font-sans antialiased bg-[#070707] flex flex-col justify-between">
 
   <div id="app" class="min-h-screen flex flex-col max-w-md mx-auto w-full bg-[#070707] shadow-2xl relative border-x border-[#1A1A1A]">
 
@@ -129,7 +113,6 @@
             <div id="coachPinGroup" class="hidden pt-1">
               <label class="block text-xs uppercase font-mono text-brand-neon mb-1">Codice Segreto Coach</label>
               <input type="password" id="coachPinInput" class="w-full bg-brand-card border border-brand-neon/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-neon transition" placeholder="Inserisci il PIN Coach">
-              <p class="text-[10px] text-brand-muted mt-1">Necessario per registrarsi come Coach.</p>
             </div>
           </div>
 
@@ -189,72 +172,16 @@
             </div>
 
             <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione (es. 10km Fondo Lento)</label>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione</label>
               <input type="text" id="workoutTitle" placeholder="es. 10km Fondo Lento" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
             </div>
 
             <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli Sessione</label>
-              <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'30/km con rec 1'30 deambulato + 2km defaticamento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none"></textarea>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli</label>
+              <textarea id="workoutDetails" rows="3" placeholder="Dettagli allenamento..." class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none"></textarea>
             </div>
 
-            <button type="submit" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+            <button type="submit" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider">
               Invia Allenamento
             </button>
-          </form>
-        </div>
-
-        <div>
-          <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Allenamenti Divisi per Atleta e Settimana</h3>
-          <div id="coachWorkoutsList" class="space-y-4">
-            <p class="text-xs text-brand-muted italic text-center py-4">Caricamento allenamenti...</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ATHLETE DASHBOARD -->
-      <section id="athleteDashboard" class="hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-black uppercase italic">I Tuoi Allenamenti</h2>
-          <p class="text-xs text-brand-muted">Pianificazione divisa per settimana con contachilometri</p>
-        </div>
-
-        <div id="athleteWorkoutsList" class="space-y-6">
-          <p class="text-xs text-brand-muted italic text-center py-4">Caricamento scheda...</p>
-        </div>
-      </section>
-
-    </main>
-
-  </div>
-
-  <!-- MAIN JS APP LOGIC -->
-  <script>
-    const COACH_PIN = "GIGI2026";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-pFIDIDdz4w5KeSOQjedmp9VLUPXfs88",
-      authDomain: "rungigirun-de040.firebaseapp.com",
-      projectId: "rungigirun-de040",
-      storageBucket: "rungigirun-de040.firebasestorage.app",
-      messagingSenderId: "443483989504",
-      appId: "1:443483989504:web:a193c118ab58c5177adae5",
-      measurementId: "G-T47KNG4E5J"
-    };
-
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    let isSignUpMode = false;
-    let currentUser = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const dateEl = document.getElementById('workoutDate');
-      if (dateEl) dateEl.valueAsDate = new Date();
-    });
-
-    window.toggleAuthMode = function() {
-      isSignUp
+          </form
