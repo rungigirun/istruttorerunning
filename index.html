@@ -10,10 +10,6 @@
   <meta name="apple-mobile-web-app-title" content="rungigirun">
   <meta name="theme-color" content="#070707">
 
-  <!-- Favicon Ufficiale RGR -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23070707'/%3E%3Crect x='24' y='24' width='464' height='464' rx='96' fill='%23FF6B00'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black, Impact, sans-serif' font-weight='900' font-style='italic' font-size='210' letter-spacing='-10' fill='%23070707'%3ERGR%3C/text%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23070707'/%3E%3Crect x='32' y='32' width='448' height='448' rx='96' fill='%23FF6B00'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black, Impact, sans-serif' font-weight='900' font-style='italic' font-size='200' letter-spacing='-10' fill='%23070707'%3ERGR%3C/text%3E%3C/svg%3E">
-
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -199,4 +195,51 @@
 
             <div>
               <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli Sessione</label>
-              <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'
+              <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'30/km con rec 1'30 deambulato + 2km defaticamento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+              Invia Allenamento
+            </button>
+          </form>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Allenamenti Divisi per Atleta e Settimana</h3>
+          <div id="coachWorkoutsList" class="space-y-4">
+            <p class="text-xs text-brand-muted italic text-center py-4">Caricamento allenamenti...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ATHLETE DASHBOARD -->
+      <section id="athleteDashboard" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-black uppercase italic">I Tuoi Allenamenti</h2>
+          <p class="text-xs text-brand-muted">Pianificazione divisa per settimana con contachilometri</p>
+        </div>
+
+        <div id="athleteWorkoutsList" class="space-y-6">
+          <p class="text-xs text-brand-muted italic text-center py-4">Caricamento scheda...</p>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MAIN JS APP LOGIC -->
+  <script>
+    const COACH_PIN = "GIGI2026";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-pFIDIDdz4w5KeSOQjedmp9VLUPXfs88",
+      authDomain: "rungigirun-de040.firebaseapp.com",
+      projectId: "rungigirun-de040",
+      storageBucket: "rungigirun-de040.firebasestorage.app",
+      messagingSenderId: "443483989504",
+      appId: "1:443483989504:web:a193c118ab58c5177adae5",
+      measurementId: "G-T47KNG4E5J"
+    };
+
+    if
