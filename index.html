@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>rungigirun - Gestione Allenamenti</title>
   
-  <!-- iOS / Safari & Browser Web App Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="rungigirun">
   <meta name="theme-color" content="#070707">
 
-  <!-- Favicon Ufficiale RGR (Nero e Arancione Fluo) -->
+  <!-- Favicon Ufficiale RGR -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23070707'/%3E%3Crect x='24' y='24' width='464' height='464' rx='96' fill='%23FF6B00'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black, Impact, sans-serif' font-weight='900' font-style='italic' font-size='210' letter-spacing='-10' fill='%23070707'%3ERGR%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23070707'/%3E%3Crect x='32' y='32' width='448' height='448' rx='96' fill='%23FF6B00'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black, Impact, sans-serif' font-weight='900' font-style='italic' font-size='200' letter-spacing='-10' fill='%23070707'%3ERGR%3C/text%3E%3C/svg%3E">
 
@@ -60,10 +59,8 @@
 </head>
 <body class="h-full text-white font-sans antialiased bg-[#070707] flex flex-col justify-between custom-scrollbar">
 
-  <!-- APP CONTAINER -->
   <div id="app" class="min-h-screen flex flex-col max-w-md mx-auto w-full bg-[#070707] shadow-2xl relative border-x border-[#1A1A1A]">
 
-    <!-- HEADER BRANDING -->
     <header class="sticky top-0 z-40 bg-[#070707]/90 backdrop-blur-md border-b border-brand-border px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 rounded-xl bg-brand-neon flex items-center justify-center font-black text-black tracking-tighter text-xl italic shadow-[0_0_15px_rgba(255,107,0,0.4)]">
@@ -84,7 +81,6 @@
       </div>
     </header>
 
-    <!-- MAIN VIEW AREA -->
     <main class="flex-1 p-4 pb-10">
 
       <!-- AUTH CONTAINER -->
@@ -176,4 +172,31 @@
           <form onsubmit="handleCreateWorkout(event)" class="space-y-3">
             <div>
               <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Email Atleta Destinatario</label>
-              <input type="email" id="workoutAthleteEmail" placeholder="atleta@email.it" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:
+              <input type="email" id="workoutAthleteEmail" placeholder="atleta@email.it" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Tipo Sessione</label>
+                <select id="workoutType" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+                  <option value="Ripetute">Ripetute / Interval</option>
+                  <option value="Fondo Lento">Fondo Lento (FL)</option>
+                  <option value="Tempo Run">Tempo Run / Medio</option>
+                  <option value="Long Run">Long Run / Lunghissimo</option>
+                  <option value="Gara">Test / Gara</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Data Esecuzione</label>
+                <input type="date" id="workoutDate" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione (es. 10km Fondo Lento)</label>
+              <input type="text" id="workoutTitle" placeholder="es. 10km Fondo Lento" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli Sessione</label>
+              <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'
