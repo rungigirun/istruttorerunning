@@ -36,8 +36,24 @@
       }
     }
   </script>
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #121212;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #242424;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-<body class="h-full text-white font-sans antialiased bg-[#070707] flex flex-col justify-between">
+<body class="h-full text-white font-sans antialiased bg-[#070707] flex flex-col justify-between custom-scrollbar">
 
   <div id="app" class="min-h-screen flex flex-col max-w-md mx-auto w-full bg-[#070707] shadow-2xl relative border-x border-[#1A1A1A]">
 
@@ -110,78 +126,4 @@
             </div>
 
             <!-- PIN SEGRETO COACH -->
-            <div id="coachPinGroup" class="hidden pt-1">
-              <label class="block text-xs uppercase font-mono text-brand-neon mb-1">Codice Segreto Coach</label>
-              <input type="password" id="coachPinInput" class="w-full bg-brand-card border border-brand-neon/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-neon transition" placeholder="Inserisci il PIN Coach">
-            </div>
-          </div>
-
-          <button type="submit" id="authSubmitBtn" class="w-full bg-brand-neon hover:bg-brand-neonDark text-black font-black uppercase py-3.5 rounded-xl transition shadow-[0_0_20px_rgba(255,107,0,0.3)] tracking-wider mt-2">
-            Accedi
-          </button>
-        </form>
-
-        <div class="text-center mt-6">
-          <button type="button" onclick="toggleAuthMode()" id="authToggleBtn" class="text-xs text-brand-muted hover:text-white underline font-mono">
-            Non hai un account? Registrati
-          </button>
-        </div>
-      </section>
-
-      <!-- COACH DASHBOARD -->
-      <section id="coachDashboard" class="hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-black uppercase italic">Dashboard Coach</h2>
-          <p class="text-xs text-brand-muted">Assegna e monitora gli allenamenti</p>
-        </div>
-
-        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">I Tuoi Atleti Registrati</h3>
-            <button onclick="loadAthletesList()" class="text-[11px] text-brand-muted hover:text-white underline font-mono">Aggiorna</button>
-          </div>
-          <div id="athletesListContainer" class="flex flex-wrap gap-2 pt-1">
-            <p class="text-xs text-brand-muted italic">Caricamento atleti...</p>
-          </div>
-        </div>
-
-        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
-          <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Nuovo Allenamento</h3>
-          
-          <form onsubmit="handleCreateWorkout(event)" class="space-y-3">
-            <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Email Atleta Destinatario</label>
-              <input type="email" id="workoutAthleteEmail" placeholder="atleta@email.it" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Tipo Sessione</label>
-                <select id="workoutType" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
-                  <option value="Ripetute">Ripetute / Interval</option>
-                  <option value="Fondo Lento">Fondo Lento (FL)</option>
-                  <option value="Tempo Run">Tempo Run / Medio</option>
-                  <option value="Long Run">Long Run / Lunghissimo</option>
-                  <option value="Gara">Test / Gara</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Data Esecuzione</label>
-                <input type="date" id="workoutDate" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione</label>
-              <input type="text" id="workoutTitle" placeholder="es. 10km Fondo Lento" required class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none">
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli</label>
-              <textarea id="workoutDetails" rows="3" placeholder="Dettagli allenamento..." class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider">
-              Invia Allenamento
-            </button>
-          </form
+            <div id="coachPinGroup"
