@@ -5,11 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>rungigirun - Gestione Allenamenti</title>
   
+  <!-- iOS / Safari & Browser Web App Meta Tags + Logo RGR -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="rungigirun">
   <meta name="theme-color" content="#070707">
 
+  <!-- Icona Browser & Schermata Home (Logo RGR Nero e Arancione Fluo) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23070707'/%3E%3Crect x='24' y='24' width='464' height='464' rx='96' fill='%23FF6B00'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black, Impact, sans-serif' font-weight='900' font-style='italic' font-size='210' letter-spacing='-10' fill='%23070707'%3ERGR%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23070707'/%3E%3Crect x='32' y='32' width='448' height='448' rx='96' fill='%23FF6B00'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black, Impact, sans-serif' font-weight='900' font-style='italic' font-size='200' letter-spacing='-10' fill='%23070707'%3ERGR%3C/text%3E%3C/svg%3E">
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -55,8 +60,10 @@
 </head>
 <body class="h-full text-white font-sans antialiased bg-[#070707] flex flex-col justify-between custom-scrollbar">
 
+  <!-- APP CONTAINER -->
   <div id="app" class="min-h-screen flex flex-col max-w-md mx-auto w-full bg-[#070707] shadow-2xl relative border-x border-[#1A1A1A]">
 
+    <!-- HEADER BRANDING -->
     <header class="sticky top-0 z-40 bg-[#070707]/90 backdrop-blur-md border-b border-brand-border px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 rounded-xl bg-brand-neon flex items-center justify-center font-black text-black tracking-tighter text-xl italic shadow-[0_0_15px_rgba(255,107,0,0.4)]">
@@ -77,6 +84,7 @@
       </div>
     </header>
 
+    <!-- MAIN VIEW AREA -->
     <main class="flex-1 p-4 pb-10">
 
       <!-- AUTH CONTAINER -->
@@ -133,8 +141,7 @@
             </div>
           </div>
 
-          <!-- PULSANTE ACCEDI BLINDATO -->
-          <button type="submit" id="authSubmitBtn" style="display: block !important;" class="w-full bg-brand-neon hover:bg-brand-neonDark text-black font-black uppercase py-3.5 rounded-xl transition shadow-[0_0_20px_rgba(255,107,0,0.3)] tracking-wider mt-2">
+          <button type="submit" id="authSubmitBtn" class="w-full bg-brand-neon hover:bg-brand-neonDark text-black font-black uppercase py-3.5 rounded-xl transition shadow-[0_0_20px_rgba(255,107,0,0.3)] tracking-wider mt-2">
             Accedi
           </button>
         </form>
@@ -216,4 +223,190 @@
       <!-- ATHLETE DASHBOARD -->
       <section id="athleteDashboard" class="hidden space-y-6">
         <div>
-          <h2 class="text-
+          <h2 class="text-xl font-black uppercase italic">I Tuoi Allenamenti</h2>
+          <p class="text-xs text-brand-muted">Pianificazione divisa per settimana con contachilometri</p>
+        </div>
+
+        <div id="athleteWorkoutsList" class="space-y-6">
+          <p class="text-xs text-brand-muted italic text-center py-4">Caricamento scheda...</p>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MAIN JS APP LOGIC -->
+  <script>
+    const COACH_PIN = "GIGI2026";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-pFIDIDdz4w5KeSOQjedmp9VLUPXfs88",
+      authDomain: "rungigirun-de040.firebaseapp.com",
+      projectId: "rungigirun-de040",
+      storageBucket: "rungigirun-de040.firebasestorage.app",
+      messagingSenderId: "443483989504",
+      appId: "1:443483989504:web:a193c118ab58c5177adae5",
+      measurementId: "G-T47KNG4E5J"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let isSignUpMode = false;
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateEl = document.getElementById('workoutDate');
+      if (dateEl) dateEl.valueAsDate = new Date();
+    });
+
+    window.toggleAuthMode = function() {
+      isSignUpMode = !isSignUpMode;
+      const title = document.getElementById('authTitle');
+      const submitBtn = document.getElementById('authSubmitBtn');
+      const toggleBtn = document.getElementById('authToggleBtn');
+      const roleGroup = document.getElementById('roleSelectorGroup');
+
+      if (isSignUpMode) {
+        if (title) title.innerText = 'Registrazione';
+        if (submitBtn) submitBtn.innerText = 'Registrati';
+        if (toggleBtn) toggleBtn.innerText = 'Hai già un account? Accedi';
+        if (roleGroup) roleGroup.classList.remove('hidden');
+        handleRoleChange();
+      } else {
+        if (title) title.innerText = 'Accedi';
+        if (submitBtn) submitBtn.innerText = 'Accedi';
+        if (toggleBtn) toggleBtn.innerText = 'Non hai un account? Registrati';
+        if (roleGroup) roleGroup.classList.add('hidden');
+      }
+    };
+
+    window.handleRoleChange = function() {
+      const selectedRole = document.querySelector('input[name="userRole"]:checked')?.value;
+      const pinGroup = document.getElementById('coachPinGroup');
+      if (pinGroup) {
+        if (selectedRole === 'coach') {
+          pinGroup.classList.remove('hidden');
+        } else {
+          pinGroup.classList.add('hidden');
+        }
+      }
+    };
+
+    window.togglePasswordVisibility = function() {
+      const passwordInput = document.getElementById('authPassword');
+      if (!passwordInput) return;
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+      } else {
+        passwordInput.type = 'password';
+      }
+    };
+
+    window.handleForgotPassword = async function() {
+      const email = document.getElementById('authEmail').value.trim();
+      if (!email) {
+        alert("Inserisci prima la tua email nel campo in alto, poi clicca su 'Password dimenticata?'");
+        return;
+      }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        alert("Email inviata! Controlla la tua casella di posta per reimpostare la password.");
+      } catch (err) {
+        alert("Errore invio email: " + err.message);
+      }
+    };
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          const role = userDoc.exists ? (userDoc.data().role || 'athlete') : 'athlete';
+          showDashboard(role);
+        } catch (e) {
+          showDashboard('athlete');
+        }
+      } else {
+        currentUser = null;
+        showAuth();
+      }
+    });
+
+    window.handleAuthSubmit = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
+      const password = document.getElementById('authPassword').value;
+
+      try {
+        if (isSignUpMode) {
+          const roleElement = document.querySelector('input[name="userRole"]:checked');
+          const role = roleElement ? roleElement.value : 'athlete';
+          
+          if (role === 'coach') {
+            const enteredPin = document.getElementById('coachPinInput').value.trim();
+            if (enteredPin !== COACH_PIN) {
+              alert("Codice Segreto Coach Errato! Impossibile registrarsi come Coach.");
+              return;
+            }
+          }
+
+          const cred = await auth.createUserWithEmailAndPassword(email, password);
+          await db.collection('users').doc(cred.user.uid).set({
+            email: email,
+            role: role,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          await auth.signInWithEmailAndPassword(email, password);
+        }
+      } catch (err) {
+        alert("Errore Autenticazione: " + err.message);
+      }
+    };
+
+    window.handleLogout = function() {
+      auth.signOut().then(() => {
+        showAuth();
+      });
+    };
+
+    function showDashboard(role) {
+      const authSec = document.getElementById('authSection');
+      const coachDash = document.getElementById('coachDashboard');
+      const athleteDash = document.getElementById('athleteDashboard');
+      
+      if (authSec) authSec.classList.add('hidden');
+      
+      const badge = document.getElementById('userBadge');
+      if (badge) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      }
+      const roleTag = document.getElementById('roleTag');
+      if (roleTag) roleTag.innerText = role;
+
+      if (role === 'coach') {
+        if (coachDash) coachDash.classList.remove('hidden');
+        if (athleteDash) athleteDash.classList.add('hidden');
+        loadCoachWorkouts();
+        loadAthletesList();
+      } else {
+        if (athleteDash) athleteDash.classList.remove('hidden');
+        if (coachDash) coachDash.classList.add('hidden');
+        loadAthleteWorkouts();
+      }
+    }
+
+    function showAuth() {
+      const authSec = document.getElementById('authSection');
+      const coachDash = document.getElementById('coachDashboard');
+      const athleteDash = document.getElementById('athleteDashboard');
+      
+      if (authSec) authSec.classList.remove('hidden');
+      if (coachDash) coachDash.classList.add('hidden');
+      if (athleteDash) athlete
