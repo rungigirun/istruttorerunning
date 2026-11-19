@@ -153,7 +153,7 @@
 
         <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">I Tuoi Atleti Registrati</h3>
+            <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Atleti & Utenti Registrati</h3>
             <button onclick="loadAthletesList()" class="text-[11px] text-brand-muted hover:text-white underline font-mono">Aggiorna</button>
           </div>
           <div id="athletesListContainer" class="flex flex-wrap gap-2 pt-1">
@@ -430,27 +430,28 @@
       return d.toLocaleDateString('it-IT', options);
     }
 
+    // CARICA TUTTI GLI UTENTI/ATLETI SENZA FILTRO BLOCCANTE SUL RUOLO
     window.loadAthletesList = function() {
       const container = document.getElementById('athletesListContainer');
       if (!container) return;
 
       db.collection('users')
-        .where('role', '==', 'athlete')
         .get()
         .then((snapshot) => {
           if (snapshot.empty) {
-            container.innerHTML = '<p class="text-xs text-brand-muted italic">Nessun atleta registrato al momento.</p>';
+            container.innerHTML = '<p class="text-xs text-brand-muted italic">Nessun utente trovato nella collezione users.</p>';
             return;
           }
           let html = '';
           snapshot.forEach((docSnap) => {
-            const athlete = docSnap.data();
+            const userData = docSnap.data();
             const docId = docSnap.id;
-            const email = athlete.email || 'Senza email';
+            const email = userData.email || 'Senza email';
+            const roleLabel = userData.role === 'coach' ? 'Coach' : 'Atleta';
             html += `
               <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#070707] border border-brand-border text-xs text-white font-mono">
                 <button type="button" onclick="selectAthleteEmail('${email}')" class="hover:text-brand-neon transition flex items-center gap-1.5">
-                  <span>🏃‍♂️ ${email}</span>
+                  <span>🏃‍♂️ ${email} <span class="text-[10px] text-brand-muted">(${roleLabel})</span></span>
                 </button>
                 <button type="button" onclick="deleteAthleteProfile('${docId}', '${email}')" class="ml-1 text-red-400 hover:text-red-300 p-1 font-bold" title="Elimina">✕</button>
               </div>
@@ -459,15 +460,15 @@
           container.innerHTML = html;
         })
         .catch(() => {
-          container.innerHTML = '<p class="text-xs text-brand-muted italic">Nessun atleta o tabella non inizializzata.</p>';
+          container.innerHTML = '<p class="text-xs text-brand-muted italic">Errore nel caricamento utenti.</p>';
         });
     };
 
     window.deleteAthleteProfile = async function(docId, email) {
-      if (confirm(`Vuoi rimuovere il profilo di ${email} dalla lista atleti?`)) {
+      if (confirm(`Vuoi rimuovere il profilo di ${email} dalla lista?`)) {
         try {
           await db.collection('users').doc(docId).delete();
-          alert("Atleta rimosso con successo dalla lista.");
+          alert("Profilo rimosso con successo.");
           loadAthletesList();
         } catch (err) {
           alert("Errore durante la rimozione: " + err.message);
@@ -495,3 +496,287 @@
           status: 'assigned',
           feedback: null,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Allenamento inviato con successo!');
+        document.getElementById('workoutTitle').value = '';
+        document.getElementById('workoutDetails').value = '';
+        document.getElementById('workoutDate').valueAsDate = new Date();
+      } catch (err) {
+        alert("Errore invio: " + err.message);
+      }
+    };
+
+    function getMondayDate(dateStr) {
+      if (!dateStr) return null;
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return null;
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const dayNum = parseInt(parts[2], 10);
+      
+      const d = new Date(year, month, dayNum);
+      if (isNaN(d.getTime())) return null;
+
+      const dayOfWeek = d.getDay();
+      const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+      
+      const monday = new Date(d.setDate(diff));
+      monday.setHours(0, 0, 0, 0);
+      return monday;
+    }
+
+    function formatWeekLabel(mondayDate) {
+      const sunday = new Date(mondayDate);
+      sunday.setDate(mondayDate.getDate() + 6);
+
+      const options = { day: 'numeric', month: 'short', year: 'numeric' };
+      return `Settimana: ${mondayDate.toLocaleDateString('it-IT', options)} - ${sunday.toLocaleDateString('it-IT', options)}`;
+    }
+
+    function extractKilometers(text) {
+      if (!text) return 0;
+      const match = text.match(/(\d+([.,]\d+)?)\s*(km|chilometri)/i);
+      if (match) {
+        return parseFloat(match[1].replace(',', '.'));
+      }
+      return 0;
+    }
+
+    // CARICA TUTTI GLI ALLENAMENTI PRESENTI IN WORKOUTS (NON SOLO QUELLI CON UN SINGOLO UID)
+    function loadCoachWorkouts() {
+      const container = document.getElementById('coachWorkoutsList');
+      if (!container) return;
+
+      db.collection('workouts').onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessun allenamento presente nel database.</p>';
+          return;
+        }
+
+        const athletesMap = {};
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const email = (data.athleteEmail || 'Senza Email').toLowerCase();
+          if (!athletesMap[email]) {
+            athletesMap[email] = [];
+          }
+          athletesMap[email].push({ id: doc.id, ...data });
+        });
+
+        let html = '';
+        for (const [athleteEmail, workouts] of Object.entries(athletesMap)) {
+          workouts.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+          const weeksMap = new Map();
+          workouts.forEach(w => {
+            const monday = getMondayDate(w.date);
+            const key = monday ? monday.getTime() : 0;
+            if (!weeksMap.has(key)) {
+              weeksMap.set(key, { mondayDate: monday, workouts: [] });
+            }
+            weeksMap.get(key).workouts.push(w);
+          });
+
+          const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
+
+          html += `
+            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
+              <div class="flex items-center justify-between border-b border-brand-border pb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-neon font-mono">
+                  🏃‍♂️ ${athleteEmail}
+                </span>
+                <span class="text-[10px] font-mono bg-[#070707] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">
+                  ${workouts.length} sessioni
+                </span>
+              </div>
+              <div class="space-y-4">
+          `;
+
+          sortedWeekKeys.forEach(weekKey => {
+            const weekData = weeksMap.get(weekKey);
+            const weekTitle = weekData.mondayDate ? formatWeekLabel(weekData.mondayDate) : 'Altre date';
+            const weekWorkouts = weekData.workouts;
+
+            let totalKm = 0;
+            weekWorkouts.forEach(w => {
+              totalKm += extractKilometers(w.title) + extractKilometers(w.details);
+            });
+
+            html += `
+              <div class="bg-[#070707] border border-brand-border rounded-xl p-3 space-y-3">
+                <div class="flex items-center justify-between border-b border-brand-border pb-2">
+                  <div>
+                    <span class="text-[11px] font-bold text-brand-neon font-mono">📅 ${weekTitle}</span>
+                    ${totalKm > 0 ? `<span class="text-[10px] font-mono text-white font-bold block mt-0.5">Volume Settimanale: ${totalKm} km</span>` : ''}
+                  </div>
+                </div>
+                <div class="space-y-2.5">
+            `;
+
+            weekWorkouts.forEach(d => {
+              const isDone = d.status === 'completed';
+              const formattedDate = formatDateIt(d.date);
+              html += `
+                <div class="bg-brand-card border ${isDone ? 'border-green-900/50' : 'border-brand-border'} rounded-xl p-3 space-y-2">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <span class="text-[10px] font-mono text-brand-muted">${formattedDate} • <strong class="text-brand-neon">${d.type}</strong></span>
+                      <h4 class="font-bold text-sm mt-0.5">${d.title}</h4>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-brand-border ${isDone ? 'text-green-400 bg-green-950/30' : 'text-brand-neon'}">${d.status}</span>
+                  </div>
+                  <p class="text-xs text-brand-muted">${d.details || ''}</p>
+                  ${d.feedback ? `<div class="p-2 bg-[#070707] rounded-lg border border-brand-border text-xs"><p class="text-brand-neon font-bold text-[10px]">Feedback Atleta:</p><p>${d.feedback}</p></div>` : ''}
+                  <div class="pt-1 flex justify-end">
+                    <button onclick="deleteWorkout('${d.id}')" class="text-[11px] text-red-400 hover:text-red-300 font-mono transition">
+                      🗑️ Elimina
+                    </button>
+                  </div>
+                </div>
+              `;
+            });
+
+            html += `
+                </div>
+              </div>
+            `;
+          });
+
+          html += `
+              </div>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+      });
+    }
+
+    window.deleteWorkout = async function(id) {
+      if (confirm("Sei sicuro di voler eliminare definitivamente questo allenamento?")) {
+        try {
+          await db.collection('workouts').doc(id).delete();
+          alert("Allenamento eliminato con successo.");
+        } catch (err) {
+          alert("Errore durante l'eliminazione: " + err.message);
+        }
+      }
+    };
+
+    function loadAthleteWorkouts() {
+      const container = document.getElementById('athleteWorkoutsList');
+      if (!container) return;
+
+      const userEmail = (currentUser.email || '').toLowerCase().trim();
+
+      db.collection('workouts').onSnapshot(snapshot => {
+        let allWorkouts = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if ((data.athleteEmail || '').toLowerCase().trim() === userEmail) {
+            allWorkouts.push({ id: doc.id, ...data });
+          }
+        });
+
+        if (allWorkouts.length === 0) {
+          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessun allenamento in scheda.</p>';
+          return;
+        }
+
+        allWorkouts.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        const weeksMap = new Map();
+        allWorkouts.forEach(w => {
+          const monday = getMondayDate(w.date);
+          const key = monday ? monday.getTime() : 0;
+          if (!weeksMap.has(key)) {
+            weeksMap.set(key, { mondayDate: monday, workouts: [] });
+          }
+          weeksMap.get(key).workouts.push(w);
+        });
+
+        const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
+
+        let html = '';
+        sortedWeekKeys.forEach(key => {
+          const weekData = weeksMap.get(key);
+          const weekTitle = weekData.mondayDate ? formatWeekLabel(weekData.mondayDate) : 'Altre date';
+          const workouts = weekData.workouts;
+
+          let totalKm = 0;
+          workouts.forEach(w => {
+            totalKm += extractKilometers(w.title) + extractKilometers(w.details);
+          });
+
+          html += `
+            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
+              <div class="flex items-center justify-between border-b border-brand-border pb-3">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-brand-neon font-mono">
+                    📅 ${weekTitle}
+                  </span>
+                  ${totalKm > 0 ? `<span class="text-[11px] font-mono text-white font-bold mt-1 block">Volume Settimanale: ${totalKm} km</span>` : ''}
+                </div>
+                <span class="text-[10px] font-mono bg-[#070707] px-2.5 py-1 rounded-full border border-brand-border text-brand-muted">
+                  ${workouts.length} sessioni
+                </span>
+              </div>
+              <div class="space-y-3">
+          `;
+
+          workouts.forEach(d => {
+            const id = d.id;
+            const isDone = d.status === 'completed';
+            const formattedDate = formatDateIt(d.date);
+            html += `
+              <div class="bg-[#070707] border ${isDone ? 'border-green-900/50' : 'border-brand-border'} rounded-xl p-3.5 space-y-3">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="text-[10px] font-mono text-brand-neon font-bold uppercase tracking-wider">${d.type}</span>
+                    <h4 class="font-black text-base mt-0.5 text-white">${d.title}</h4>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-card border border-brand-border text-brand-muted">${formattedDate}</span>
+                </div>
+                <p class="text-xs text-gray-300 p-2.5 rounded-lg bg-brand-card border border-brand-border">${d.details || ''}</p>
+                ${!isDone ? `
+                  <div>
+                    <button onclick="toggleFeedbackForm('${id}')" class="w-full bg-brand-border hover:bg-gray-800 text-xs text-white font-bold uppercase py-2 rounded-lg transition">Segna Come Completato</button>
+                    <div id="feedbackForm_${id}" class="hidden mt-3 space-y-2">
+                      <textarea id="feedbackText_${id}" rows="2" placeholder="Inserisci ritmi e sensazioni (RPE 1-10)..." class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-brand-neon"></textarea>
+                      <button onclick="submitFeedback('${id}')" class="w-full bg-brand-neon text-black font-black uppercase text-xs py-2 rounded-lg">Invia a Coach</button>
+                    </div>
+                  </div>
+                ` : `<div class="p-2.5 bg-green-950/20 rounded-lg border border-green-900/30 text-xs"><span class="text-[10px] font-bold text-green-400 block">Resoconto inviato:</span><p>${d.feedback}</p></div>`}
+              </div>
+            `;
+          });
+
+          html += `
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      });
+    }
+
+    window.toggleFeedbackForm = function(id) {
+      const el = document.getElementById(`feedbackForm_${id}`);
+      if (el) el.classList.toggle('hidden');
+    };
+
+    window.submitFeedback = async function(id) {
+      const textEl = document.getElementById(`feedbackText_${id}`);
+      const text = textEl ? textEl.value.trim() : '';
+      if (!text) return alert("Inserisci un breve resoconto prima di confermare!");
+      try {
+        await db.collection('workouts').doc(id).update({ status: 'completed', feedback: text });
+        alert('Allenamento completato con successo!');
+      } catch (err) {
+        alert("Errore: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>
