@@ -146,67 +146,146 @@
 
       <!-- COACH DASHBOARD -->
       <section id="coachDashboard" class="hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-black uppercase italic">Dashboard Coach</h2>
-          <p class="text-xs text-brand-muted">Assegna e monitora gli allenamenti</p>
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h2 class="text-xl font-black uppercase italic">Dashboard Coach</h2>
+            <p class="text-xs text-brand-muted">Assegna e monitora allenamenti e gare</p>
+          </div>
+          <a href="#coachRacesSection" onclick="toggleCoachRacesView(true)" class="shrink-0 px-3 py-2 rounded-xl bg-brand-card border border-brand-neon text-brand-neon hover:bg-brand-neon hover:text-black text-[11px] font-mono uppercase font-bold transition">
+            🏆 Gare &amp; Tempi
+          </a>
         </div>
 
-        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Atleti & Utenti Registrati</h3>
-            <button onclick="loadAthletesList()" class="text-[11px] text-brand-muted hover:text-white underline font-mono">Aggiorna</button>
+        <!-- VISTA ALLENAMENTI COACH -->
+        <div id="coachWorkoutsView" class="space-y-6">
+          <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Atleti &amp; Utenti Registrati</h3>
+              <button onclick="loadAthletesList()" class="text-[11px] text-brand-muted hover:text-white underline font-mono">Aggiorna</button>
+            </div>
+            <div id="athletesListContainer" class="flex flex-wrap gap-2 pt-1">
+              <p class="text-xs text-brand-muted italic">Caricamento atleti...</p>
+            </div>
           </div>
-          <div id="athletesListContainer" class="flex flex-wrap gap-2 pt-1">
-            <p class="text-xs text-brand-muted italic">Caricamento atleti...</p>
+
+          <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
+            <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Nuovo Allenamento</h3>
+            
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Email Atleta Destinatario</label>
+                <input type="email" id="workoutAthleteEmail" placeholder="atleta@email.it" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Tipo Sessione</label>
+                  <select id="workoutType" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+                    <option value="Ripetute">Ripetute / Interval</option>
+                    <option value="Fondo Lento">Fondo Lento (FL)</option>
+                    <option value="Tempo Run">Tempo Run / Medio</option>
+                    <option value="Long Run">Long Run / Lunghissimo</option>
+                    <option value="Gara">Test / Gara</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Data Esecuzione</label>
+                  <input type="date" id="workoutDate" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione (es. 10km Fondo Lento)</label>
+                <input type="text" id="workoutTitle" placeholder="es. 10km Fondo Lento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura &amp; Dettagli Sessione</label>
+                <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'30/km con rec 1'30 deambulato + 2km defaticamento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none text-white"></textarea>
+              </div>
+
+              <button type="button" onclick="handleCreateWorkoutDirect()" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+                Invia Allenamento
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Allenamenti Divisi per Atleta e Settimana</h3>
+            <div id="coachWorkoutsList" class="space-y-4">
+              <p class="text-xs text-brand-muted italic text-center py-4">Caricamento allenamenti...</p>
+            </div>
           </div>
         </div>
 
-        <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
-          <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Nuovo Allenamento</h3>
-          
-          <div class="space-y-3">
-            <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Email Atleta Destinatario</label>
-              <input type="email" id="workoutAthleteEmail" placeholder="atleta@email.it" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Tipo Sessione</label>
-                <select id="workoutType" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
-                  <option value="Ripetute">Ripetute / Interval</option>
-                  <option value="Fondo Lento">Fondo Lento (FL)</option>
-                  <option value="Tempo Run">Tempo Run / Medio</option>
-                  <option value="Long Run">Long Run / Lunghissimo</option>
-                  <option value="Gara">Test / Gara</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Data Esecuzione</label>
-                <input type="date" id="workoutDate" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Titolo Sessione (es. 10km Fondo Lento)</label>
-              <input type="text" id="workoutTitle" placeholder="es. 10km Fondo Lento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli Sessione</label>
-              <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'30/km con rec 1'30 deambulato + 2km defaticamento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none text-white"></textarea>
-            </div>
-
-            <button type="button" onclick="handleCreateWorkoutDirect()" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider shadow-[0_0_15px_rgba(255,107,0,0.2)]">
-              Invia Allenamento
+        <!-- SEZIONE GARE & TEMPI ATLETI -->
+        <div id="coachRacesSection" class="hidden space-y-6">
+          <div class="flex items-center justify-between bg-brand-card border border-brand-border rounded-2xl p-3">
+            <span class="text-xs font-mono uppercase text-brand-neon font-bold">🏆 Gare &amp; Tempi Clienti</span>
+            <button type="button" onclick="toggleCoachRacesView(false)" class="text-xs font-mono text-brand-muted hover:text-white underline">
+              ← Torna ad Allenamenti
             </button>
           </div>
-        </div>
 
-        <div>
-          <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Allenamenti Divisi per Atleta e Settimana</h3>
-          <div id="coachWorkoutsList" class="space-y-4">
-            <p class="text-xs text-brand-muted italic text-center py-4">Caricamento allenamenti...</p>
+          <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 id="raceFormTitle" class="text-xs font-mono uppercase text-brand-neon tracking-wider">Nuova Gara / Tempo</h3>
+              <button type="button" id="cancelRaceEditBtn" onclick="resetRaceForm()" class="hidden text-[11px] font-mono text-red-400 hover:text-red-300 underline">
+                Annulla modifica
+              </button>
+            </div>
+
+            <input type="hidden" id="editingRaceId" value="">
+
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Email Atleta</label>
+                <input type="email" id="raceAthleteEmail" placeholder="atleta@email.it" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Nome Gara</label>
+                <input type="text" id="raceName" placeholder="es. Maratona di Roma / Corsa dei Santi" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Distanza</label>
+                  <input type="text" id="raceDistance" placeholder="es. 10 km / 21.097 km / 42.195 km" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Data Gara</label>
+                  <input type="date" id="raceDate" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Tempo / Crono</label>
+                  <input type="text" id="raceTime" placeholder="es. 00:38:45 o 1:26:10" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Passo Medio (opz.)</label>
+                  <input type="text" id="racePace" placeholder="es. 3'52/km" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none text-white">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Note Gara</label>
+                <textarea id="raceNotes" rows="2" placeholder="Sensazioni, meteo, posizione, PB..." class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none text-white"></textarea>
+              </div>
+
+              <button type="button" id="saveRaceBtn" onclick="handleSaveRace()" class="w-full bg-brand-neon text-black font-black uppercase py-3 rounded-xl hover:bg-brand-neonDark transition tracking-wider shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+                Salva Gara
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Storico Gare &amp; Tempi</h3>
+            <div id="coachRacesList" class="space-y-3">
+              <p class="text-xs text-brand-muted italic text-center py-4">Caricamento gare...</p>
+            </div>
           </div>
         </div>
       </section>
@@ -249,11 +328,28 @@
 
     let isSignUpMode = false;
     let currentUser = null;
+    let racesCache = {};
 
     document.addEventListener('DOMContentLoaded', () => {
       const dateEl = document.getElementById('workoutDate');
       if (dateEl) dateEl.valueAsDate = new Date();
+      const raceDateEl = document.getElementById('raceDate');
+      if (raceDateEl) raceDateEl.valueAsDate = new Date();
     });
+
+    window.toggleCoachRacesView = function(showRaces) {
+      const workoutsView = document.getElementById('coachWorkoutsView');
+      const racesSection = document.getElementById('coachRacesSection');
+      if (!workoutsView || !racesSection) return;
+      if (showRaces) {
+        workoutsView.classList.add('hidden');
+        racesSection.classList.remove('hidden');
+        loadCoachRaces();
+      } else {
+        racesSection.classList.add('hidden');
+        workoutsView.classList.remove('hidden');
+      }
+    };
 
     window.toggleAuthMode = function() {
       isSignUpMode = !isSignUpMode;
@@ -397,8 +493,10 @@
       if (role === 'coach') {
         if (coachDash) coachDash.classList.remove('hidden');
         if (athleteDash) athleteDash.classList.add('hidden');
+        toggleCoachRacesView(false);
         loadCoachWorkouts();
         loadAthletesList();
+        loadCoachRaces();
       } else {
         if (athleteDash) athleteDash.classList.remove('hidden');
         if (coachDash) coachDash.classList.add('hidden');
@@ -430,7 +528,6 @@
       return d.toLocaleDateString('it-IT', options);
     }
 
-    // CARICA TUTTI GLI UTENTI/ATLETI SENZA FILTRO BLOCCANTE SUL RUOLO
     window.loadAthletesList = function() {
       const container = document.getElementById('athletesListContainer');
       if (!container) return;
@@ -482,7 +579,157 @@
         emailInput.value = email;
         emailInput.focus();
       }
+      const raceEmailInput = document.getElementById('raceAthleteEmail');
+      if (raceEmailInput && !document.getElementById('coachRacesSection').classList.contains('hidden')) {
+        raceEmailInput.value = email;
+      }
     };
+
+    // GESTIONE GARE & TEMPI
+    window.resetRaceForm = function() {
+      document.getElementById('editingRaceId').value = '';
+      document.getElementById('raceFormTitle').innerText = 'Nuova Gara / Tempo';
+      document.getElementById('saveRaceBtn').innerText = 'Salva Gara';
+      document.getElementById('cancelRaceEditBtn').classList.add('hidden');
+      document.getElementById('raceName').value = '';
+      document.getElementById('raceDistance').value = '';
+      document.getElementById('raceTime').value = '';
+      document.getElementById('racePace').value = '';
+      document.getElementById('raceNotes').value = '';
+      const raceDateEl = document.getElementById('raceDate');
+      if (raceDateEl) raceDateEl.valueAsDate = new Date();
+    };
+
+    window.startEditRace = function(raceId) {
+      const r = racesCache[raceId];
+      if (!r) return;
+      document.getElementById('editingRaceId').value = raceId;
+      document.getElementById('raceFormTitle').innerText = 'Modifica Gara / Tempo';
+      document.getElementById('saveRaceBtn').innerText = 'Aggiorna Gara';
+      document.getElementById('cancelRaceEditBtn').classList.remove('hidden');
+
+      document.getElementById('raceAthleteEmail').value = r.athleteEmail || '';
+      document.getElementById('raceName').value = r.raceName || '';
+      document.getElementById('raceDistance').value = r.distance || '';
+      document.getElementById('raceDate').value = r.date || '';
+      document.getElementById('raceTime').value = r.time || '';
+      document.getElementById('racePace').value = r.pace || '';
+      document.getElementById('raceNotes').value = r.notes || '';
+      document.getElementById('raceName').focus();
+    };
+
+    window.handleSaveRace = async function() {
+      const raceId = document.getElementById('editingRaceId').value.trim();
+      const athleteEmail = document.getElementById('raceAthleteEmail').value.trim().toLowerCase();
+      const raceName = document.getElementById('raceName').value.trim();
+      const distance = document.getElementById('raceDistance').value.trim();
+      const date = document.getElementById('raceDate').value;
+      const time = document.getElementById('raceTime').value.trim();
+      const pace = document.getElementById('racePace').value.trim();
+      const notes = document.getElementById('raceNotes').value.trim();
+
+      if (!athleteEmail || !raceName || !time) {
+        alert("Inserisci almeno email atleta, nome gara e tempo.");
+        return;
+      }
+
+      const payload = {
+        athleteEmail,
+        raceName,
+        distance,
+        date,
+        time,
+        pace,
+        notes,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        if (raceId) {
+          await db.collection('races').doc(raceId).update(payload);
+          alert("Gara aggiornata con successo!");
+        } else {
+          payload.coachUid = currentUser ? currentUser.uid : null;
+          payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection('races').add(payload);
+          alert("Gara salvata con successo!");
+        }
+        resetRaceForm();
+      } catch (err) {
+        alert("Errore salvataggio gara: " + err.message);
+      }
+    };
+
+    window.deleteRace = async function(raceId, raceName) {
+      if (confirm(`Vuoi cancellare definitivamente la gara "${raceName}"?`)) {
+        try {
+          await db.collection('races').doc(raceId).delete();
+          if (document.getElementById('editingRaceId').value === raceId) {
+            resetRaceForm();
+          }
+          alert("Gara cancellata.");
+        } catch (err) {
+          alert("Errore cancellazione gara: " + err.message);
+        }
+      }
+    };
+
+    function loadCoachRaces() {
+      const container = document.getElementById('coachRacesList');
+      if (!container) return;
+
+      db.collection('races').onSnapshot(snapshot => {
+        racesCache = {};
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessuna gara registrata al momento.</p>';
+          return;
+        }
+
+        const list = [];
+        snapshot.forEach(doc => {
+          const item = { id: doc.id, ...doc.data() };
+          racesCache[doc.id] = item;
+          list.push(item);
+        });
+
+        list.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+        let html = '';
+        list.forEach(r => {
+          const formattedDate = formatDateIt(r.date);
+          html += `
+            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-2.5">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="text-[10px] font-mono uppercase text-brand-neon font-bold">${r.athleteEmail || 'Atleta'}</span>
+                  <h4 class="font-black text-sm text-white mt-0.5">${r.raceName || 'Gara'}</h4>
+                  <p class="text-[11px] font-mono text-brand-muted">${formattedDate}${r.distance ? ` • ${r.distance}` : ''}</p>
+                </div>
+                <div class="text-right">
+                  <span class="inline-block px-2.5 py-1 rounded-lg bg-[#070707] border border-brand-neon/50 text-brand-neon font-mono font-bold text-xs">
+                    ⏱️ ${r.time || '-'}
+                  </span>
+                  ${r.pace ? `<span class="block text-[10px] font-mono text-brand-muted mt-1">Passo: ${r.pace}</span>` : ''}
+                </div>
+              </div>
+              ${r.notes ? `<p class="text-xs text-gray-300 bg-[#070707] border border-brand-border rounded-xl p-2.5">${r.notes}</p>` : ''}
+              <div class="pt-1 flex items-center justify-end gap-3 border-t border-brand-border/60">
+                <button type="button" onclick="startEditRace('${r.id}')" class="text-[11px] font-mono text-brand-neon hover:underline">
+                  ✏️ Modifica
+                </button>
+                <button type="button" onclick="deleteRace('${r.id}', '${(r.raceName || 'Gara').replace(/'/g, "\\'")}')" class="text-[11px] font-mono text-red-400 hover:text-red-300">
+                  🗑️ Cancella
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }, () => {
+        container.innerHTML = '<p class="text-xs text-red-400 italic text-center py-4">Errore nel caricamento gare.</p>';
+      });
+    }
 
     window.handleCreateWorkoutDirect = async function() {
       try {
@@ -542,7 +789,6 @@
       return 0;
     }
 
-    // CARICA TUTTI GLI ALLENAMENTI PRESENTI IN WORKOUTS (NON SOLO QUELLI CON UN SINGOLO UID)
     function loadCoachWorkouts() {
       const container = document.getElementById('coachWorkoutsList');
       if (!container) return;
