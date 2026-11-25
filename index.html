@@ -152,7 +152,7 @@
             <p class="text-xs text-brand-muted">Assegna e monitora allenamenti e gare</p>
           </div>
           <a href="#coachRacesSection" onclick="toggleCoachRacesView(true)" class="shrink-0 px-3 py-2 rounded-xl bg-brand-card border border-brand-neon text-brand-neon hover:bg-brand-neon hover:text-black text-[11px] font-mono uppercase font-bold transition">
-            🏆 Gare &amp; Tempi
+            🏆 Gare & Tempi
           </a>
         </div>
 
@@ -160,7 +160,7 @@
         <div id="coachWorkoutsView" class="space-y-6">
           <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Atleti &amp; Utenti Registrati</h3>
+              <h3 class="text-xs font-mono uppercase text-brand-neon tracking-wider">Atleti & Utenti Registrati</h3>
               <button onclick="loadAthletesList()" class="text-[11px] text-brand-muted hover:text-white underline font-mono">Aggiorna</button>
             </div>
             <div id="athletesListContainer" class="flex flex-wrap gap-2 pt-1">
@@ -200,7 +200,7 @@
               </div>
 
               <div>
-                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura &amp; Dettagli Sessione</label>
+                <label class="block text-[11px] font-mono text-brand-muted uppercase mb-1">Struttura & Dettagli Sessione</label>
                 <textarea id="workoutDetails" rows="3" placeholder="Riscaldamento 3km + 10x400m a 3'30/km con rec 1'30 deambulato + 2km defaticamento" class="w-full bg-[#070707] border border-brand-border rounded-xl px-3 py-2 text-sm focus:border-brand-neon focus:outline-none resize-none text-white"></textarea>
               </div>
 
@@ -221,7 +221,7 @@
         <!-- SEZIONE GARE & TEMPI ATLETI -->
         <div id="coachRacesSection" class="hidden space-y-6">
           <div class="flex items-center justify-between bg-brand-card border border-brand-border rounded-2xl p-3">
-            <span class="text-xs font-mono uppercase text-brand-neon font-bold">🏆 Gare &amp; Tempi Clienti</span>
+            <span class="text-xs font-mono uppercase text-brand-neon font-bold">🏆 Gare & Tempi Clienti</span>
             <button type="button" onclick="toggleCoachRacesView(false)" class="text-xs font-mono text-brand-muted hover:text-white underline">
               ← Torna ad Allenamenti
             </button>
@@ -282,7 +282,7 @@
           </div>
 
           <div>
-            <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Storico Gare &amp; Tempi</h3>
+            <h3 class="text-xs font-mono uppercase text-brand-muted tracking-wider mb-3">Storico Gare & Tempi</h3>
             <div id="coachRacesList" class="space-y-3">
               <p class="text-xs text-brand-muted italic text-center py-4">Caricamento gare...</p>
             </div>
@@ -291,14 +291,14 @@
       </section>
 
       <!-- ATHLETE DASHBOARD -->
-      <section id="athleteDashboard" class="hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-black uppercase italic">I Tuoi Allenamenti</h2>
-          <p class="text-xs text-brand-muted">Pianificazione divisa per settimana con contachilometri</p>
+      <section id="athleteDashboard" class="hidden space-y-5">
+        <div class="border-b border-brand-border pb-3">
+          <h2 class="text-2xl font-black uppercase italic tracking-tight text-white">La Tua Scheda</h2>
+          <p id="athleteSubtitleEmail" class="text-xs font-mono text-brand-muted mt-0.5">Programma settimanale e riscontri</p>
         </div>
 
         <div id="athleteWorkoutsList" class="space-y-6">
-          <p class="text-xs text-brand-muted italic text-center py-4">Caricamento scheda...</p>
+          <p class="text-xs text-brand-muted italic text-center py-6">Caricamento scheda...</p>
         </div>
       </section>
 
@@ -500,6 +500,10 @@
       } else {
         if (athleteDash) athleteDash.classList.remove('hidden');
         if (coachDash) coachDash.classList.add('hidden');
+        const subEl = document.getElementById('athleteSubtitleEmail');
+        if (subEl && currentUser && currentUser.email) {
+          subEl.innerText = currentUser.email.toLowerCase();
+        }
         loadAthleteWorkouts();
       }
     }
@@ -585,7 +589,6 @@
       }
     };
 
-    // GESTIONE GARE & TEMPI
     window.resetRaceForm = function() {
       document.getElementById('editingRaceId').value = '';
       document.getElementById('raceFormTitle').innerText = 'Nuova Gara / Tempo';
@@ -595,434 +598,4 @@
       document.getElementById('raceDistance').value = '';
       document.getElementById('raceTime').value = '';
       document.getElementById('racePace').value = '';
-      document.getElementById('raceNotes').value = '';
-      const raceDateEl = document.getElementById('raceDate');
-      if (raceDateEl) raceDateEl.valueAsDate = new Date();
-    };
-
-    window.startEditRace = function(raceId) {
-      const r = racesCache[raceId];
-      if (!r) return;
-      document.getElementById('editingRaceId').value = raceId;
-      document.getElementById('raceFormTitle').innerText = 'Modifica Gara / Tempo';
-      document.getElementById('saveRaceBtn').innerText = 'Aggiorna Gara';
-      document.getElementById('cancelRaceEditBtn').classList.remove('hidden');
-
-      document.getElementById('raceAthleteEmail').value = r.athleteEmail || '';
-      document.getElementById('raceName').value = r.raceName || '';
-      document.getElementById('raceDistance').value = r.distance || '';
-      document.getElementById('raceDate').value = r.date || '';
-      document.getElementById('raceTime').value = r.time || '';
-      document.getElementById('racePace').value = r.pace || '';
-      document.getElementById('raceNotes').value = r.notes || '';
-      document.getElementById('raceName').focus();
-    };
-
-    window.handleSaveRace = async function() {
-      const raceId = document.getElementById('editingRaceId').value.trim();
-      const athleteEmail = document.getElementById('raceAthleteEmail').value.trim().toLowerCase();
-      const raceName = document.getElementById('raceName').value.trim();
-      const distance = document.getElementById('raceDistance').value.trim();
-      const date = document.getElementById('raceDate').value;
-      const time = document.getElementById('raceTime').value.trim();
-      const pace = document.getElementById('racePace').value.trim();
-      const notes = document.getElementById('raceNotes').value.trim();
-
-      if (!athleteEmail || !raceName || !time) {
-        alert("Inserisci almeno email atleta, nome gara e tempo.");
-        return;
-      }
-
-      const payload = {
-        athleteEmail,
-        raceName,
-        distance,
-        date,
-        time,
-        pace,
-        notes,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      try {
-        if (raceId) {
-          await db.collection('races').doc(raceId).update(payload);
-          alert("Gara aggiornata con successo!");
-        } else {
-          payload.coachUid = currentUser ? currentUser.uid : null;
-          payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          await db.collection('races').add(payload);
-          alert("Gara salvata con successo!");
-        }
-        resetRaceForm();
-      } catch (err) {
-        alert("Errore salvataggio gara: " + err.message);
-      }
-    };
-
-    window.deleteRace = async function(raceId, raceName) {
-      if (confirm(`Vuoi cancellare definitivamente la gara "${raceName}"?`)) {
-        try {
-          await db.collection('races').doc(raceId).delete();
-          if (document.getElementById('editingRaceId').value === raceId) {
-            resetRaceForm();
-          }
-          alert("Gara cancellata.");
-        } catch (err) {
-          alert("Errore cancellazione gara: " + err.message);
-        }
-      }
-    };
-
-    function loadCoachRaces() {
-      const container = document.getElementById('coachRacesList');
-      if (!container) return;
-
-      db.collection('races').onSnapshot(snapshot => {
-        racesCache = {};
-        if (snapshot.empty) {
-          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessuna gara registrata al momento.</p>';
-          return;
-        }
-
-        const list = [];
-        snapshot.forEach(doc => {
-          const item = { id: doc.id, ...doc.data() };
-          racesCache[doc.id] = item;
-          list.push(item);
-        });
-
-        list.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-
-        let html = '';
-        list.forEach(r => {
-          const formattedDate = formatDateIt(r.date);
-          html += `
-            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-2.5">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="text-[10px] font-mono uppercase text-brand-neon font-bold">${r.athleteEmail || 'Atleta'}</span>
-                  <h4 class="font-black text-sm text-white mt-0.5">${r.raceName || 'Gara'}</h4>
-                  <p class="text-[11px] font-mono text-brand-muted">${formattedDate}${r.distance ? ` • ${r.distance}` : ''}</p>
-                </div>
-                <div class="text-right">
-                  <span class="inline-block px-2.5 py-1 rounded-lg bg-[#070707] border border-brand-neon/50 text-brand-neon font-mono font-bold text-xs">
-                    ⏱️ ${r.time || '-'}
-                  </span>
-                  ${r.pace ? `<span class="block text-[10px] font-mono text-brand-muted mt-1">Passo: ${r.pace}</span>` : ''}
-                </div>
-              </div>
-              ${r.notes ? `<p class="text-xs text-gray-300 bg-[#070707] border border-brand-border rounded-xl p-2.5">${r.notes}</p>` : ''}
-              <div class="pt-1 flex items-center justify-end gap-3 border-t border-brand-border/60">
-                <button type="button" onclick="startEditRace('${r.id}')" class="text-[11px] font-mono text-brand-neon hover:underline">
-                  ✏️ Modifica
-                </button>
-                <button type="button" onclick="deleteRace('${r.id}', '${(r.raceName || 'Gara').replace(/'/g, "\\'")}')" class="text-[11px] font-mono text-red-400 hover:text-red-300">
-                  🗑️ Cancella
-                </button>
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-      }, () => {
-        container.innerHTML = '<p class="text-xs text-red-400 italic text-center py-4">Errore nel caricamento gare.</p>';
-      });
-    }
-
-    window.handleCreateWorkoutDirect = async function() {
-      try {
-        await db.collection('workouts').add({
-          athleteEmail: document.getElementById('workoutAthleteEmail').value.trim().toLowerCase(),
-          coachUid: currentUser.uid,
-          type: document.getElementById('workoutType').value,
-          date: document.getElementById('workoutDate').value,
-          title: document.getElementById('workoutTitle').value,
-          details: document.getElementById('workoutDetails').value,
-          status: 'assigned',
-          feedback: null,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert('Allenamento inviato con successo!');
-        document.getElementById('workoutTitle').value = '';
-        document.getElementById('workoutDetails').value = '';
-        document.getElementById('workoutDate').valueAsDate = new Date();
-      } catch (err) {
-        alert("Errore invio: " + err.message);
-      }
-    };
-
-    function getMondayDate(dateStr) {
-      if (!dateStr) return null;
-      const parts = dateStr.split('-');
-      if (parts.length !== 3) return null;
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const dayNum = parseInt(parts[2], 10);
-      
-      const d = new Date(year, month, dayNum);
-      if (isNaN(d.getTime())) return null;
-
-      const dayOfWeek = d.getDay();
-      const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-      
-      const monday = new Date(d.setDate(diff));
-      monday.setHours(0, 0, 0, 0);
-      return monday;
-    }
-
-    function formatWeekLabel(mondayDate) {
-      const sunday = new Date(mondayDate);
-      sunday.setDate(mondayDate.getDate() + 6);
-
-      const options = { day: 'numeric', month: 'short', year: 'numeric' };
-      return `Settimana: ${mondayDate.toLocaleDateString('it-IT', options)} - ${sunday.toLocaleDateString('it-IT', options)}`;
-    }
-
-    function extractKilometers(text) {
-      if (!text) return 0;
-      const match = text.match(/(\d+([.,]\d+)?)\s*(km|chilometri)/i);
-      if (match) {
-        return parseFloat(match[1].replace(',', '.'));
-      }
-      return 0;
-    }
-
-    function loadCoachWorkouts() {
-      const container = document.getElementById('coachWorkoutsList');
-      if (!container) return;
-
-      db.collection('workouts').onSnapshot(snapshot => {
-        if (snapshot.empty) {
-          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessun allenamento presente nel database.</p>';
-          return;
-        }
-
-        const athletesMap = {};
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const email = (data.athleteEmail || 'Senza Email').toLowerCase();
-          if (!athletesMap[email]) {
-            athletesMap[email] = [];
-          }
-          athletesMap[email].push({ id: doc.id, ...data });
-        });
-
-        let html = '';
-        for (const [athleteEmail, workouts] of Object.entries(athletesMap)) {
-          workouts.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-          const weeksMap = new Map();
-          workouts.forEach(w => {
-            const monday = getMondayDate(w.date);
-            const key = monday ? monday.getTime() : 0;
-            if (!weeksMap.has(key)) {
-              weeksMap.set(key, { mondayDate: monday, workouts: [] });
-            }
-            weeksMap.get(key).workouts.push(w);
-          });
-
-          const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
-
-          html += `
-            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
-              <div class="flex items-center justify-between border-b border-brand-border pb-3">
-                <span class="text-xs font-bold uppercase tracking-wider text-brand-neon font-mono">
-                  🏃‍♂️ ${athleteEmail}
-                </span>
-                <span class="text-[10px] font-mono bg-[#070707] px-2 py-0.5 rounded-full border border-brand-border text-brand-muted">
-                  ${workouts.length} sessioni
-                </span>
-              </div>
-              <div class="space-y-4">
-          `;
-
-          sortedWeekKeys.forEach(weekKey => {
-            const weekData = weeksMap.get(weekKey);
-            const weekTitle = weekData.mondayDate ? formatWeekLabel(weekData.mondayDate) : 'Altre date';
-            const weekWorkouts = weekData.workouts;
-
-            let totalKm = 0;
-            weekWorkouts.forEach(w => {
-              totalKm += extractKilometers(w.title) + extractKilometers(w.details);
-            });
-
-            html += `
-              <div class="bg-[#070707] border border-brand-border rounded-xl p-3 space-y-3">
-                <div class="flex items-center justify-between border-b border-brand-border pb-2">
-                  <div>
-                    <span class="text-[11px] font-bold text-brand-neon font-mono">📅 ${weekTitle}</span>
-                    ${totalKm > 0 ? `<span class="text-[10px] font-mono text-white font-bold block mt-0.5">Volume Settimanale: ${totalKm} km</span>` : ''}
-                  </div>
-                </div>
-                <div class="space-y-2.5">
-            `;
-
-            weekWorkouts.forEach(d => {
-              const isDone = d.status === 'completed';
-              const formattedDate = formatDateIt(d.date);
-              html += `
-                <div class="bg-brand-card border ${isDone ? 'border-green-900/50' : 'border-brand-border'} rounded-xl p-3 space-y-2">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <span class="text-[10px] font-mono text-brand-muted">${formattedDate} • <strong class="text-brand-neon">${d.type}</strong></span>
-                      <h4 class="font-bold text-sm mt-0.5">${d.title}</h4>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-brand-border ${isDone ? 'text-green-400 bg-green-950/30' : 'text-brand-neon'}">${d.status}</span>
-                  </div>
-                  <p class="text-xs text-brand-muted">${d.details || ''}</p>
-                  ${d.feedback ? `<div class="p-2 bg-[#070707] rounded-lg border border-brand-border text-xs"><p class="text-brand-neon font-bold text-[10px]">Feedback Atleta:</p><p>${d.feedback}</p></div>` : ''}
-                  <div class="pt-1 flex justify-end">
-                    <button onclick="deleteWorkout('${d.id}')" class="text-[11px] text-red-400 hover:text-red-300 font-mono transition">
-                      🗑️ Elimina
-                    </button>
-                  </div>
-                </div>
-              `;
-            });
-
-            html += `
-                </div>
-              </div>
-            `;
-          });
-
-          html += `
-              </div>
-            </div>
-          `;
-        }
-
-        container.innerHTML = html;
-      });
-    }
-
-    window.deleteWorkout = async function(id) {
-      if (confirm("Sei sicuro di voler eliminare definitivamente questo allenamento?")) {
-        try {
-          await db.collection('workouts').doc(id).delete();
-          alert("Allenamento eliminato con successo.");
-        } catch (err) {
-          alert("Errore durante l'eliminazione: " + err.message);
-        }
-      }
-    };
-
-    function loadAthleteWorkouts() {
-      const container = document.getElementById('athleteWorkoutsList');
-      if (!container) return;
-
-      const userEmail = (currentUser.email || '').toLowerCase().trim();
-
-      db.collection('workouts').onSnapshot(snapshot => {
-        let allWorkouts = [];
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if ((data.athleteEmail || '').toLowerCase().trim() === userEmail) {
-            allWorkouts.push({ id: doc.id, ...data });
-          }
-        });
-
-        if (allWorkouts.length === 0) {
-          container.innerHTML = '<p class="text-xs text-brand-muted italic text-center py-4">Nessun allenamento in scheda.</p>';
-          return;
-        }
-
-        allWorkouts.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        const weeksMap = new Map();
-        allWorkouts.forEach(w => {
-          const monday = getMondayDate(w.date);
-          const key = monday ? monday.getTime() : 0;
-          if (!weeksMap.has(key)) {
-            weeksMap.set(key, { mondayDate: monday, workouts: [] });
-          }
-          weeksMap.get(key).workouts.push(w);
-        });
-
-        const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b);
-
-        let html = '';
-        sortedWeekKeys.forEach(key => {
-          const weekData = weeksMap.get(key);
-          const weekTitle = weekData.mondayDate ? formatWeekLabel(weekData.mondayDate) : 'Altre date';
-          const workouts = weekData.workouts;
-
-          let totalKm = 0;
-          workouts.forEach(w => {
-            totalKm += extractKilometers(w.title) + extractKilometers(w.details);
-          });
-
-          html += `
-            <div class="bg-brand-card border border-brand-border rounded-2xl p-4 space-y-4">
-              <div class="flex items-center justify-between border-b border-brand-border pb-3">
-                <div>
-                  <span class="text-xs font-bold uppercase tracking-wider text-brand-neon font-mono">
-                    📅 ${weekTitle}
-                  </span>
-                  ${totalKm > 0 ? `<span class="text-[11px] font-mono text-white font-bold mt-1 block">Volume Settimanale: ${totalKm} km</span>` : ''}
-                </div>
-                <span class="text-[10px] font-mono bg-[#070707] px-2.5 py-1 rounded-full border border-brand-border text-brand-muted">
-                  ${workouts.length} sessioni
-                </span>
-              </div>
-              <div class="space-y-3">
-          `;
-
-          workouts.forEach(d => {
-            const id = d.id;
-            const isDone = d.status === 'completed';
-            const formattedDate = formatDateIt(d.date);
-            html += `
-              <div class="bg-[#070707] border ${isDone ? 'border-green-900/50' : 'border-brand-border'} rounded-xl p-3.5 space-y-3">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <span class="text-[10px] font-mono text-brand-neon font-bold uppercase tracking-wider">${d.type}</span>
-                    <h4 class="font-black text-base mt-0.5 text-white">${d.title}</h4>
-                  </div>
-                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-card border border-brand-border text-brand-muted">${formattedDate}</span>
-                </div>
-                <p class="text-xs text-gray-300 p-2.5 rounded-lg bg-brand-card border border-brand-border">${d.details || ''}</p>
-                ${!isDone ? `
-                  <div>
-                    <button onclick="toggleFeedbackForm('${id}')" class="w-full bg-brand-border hover:bg-gray-800 text-xs text-white font-bold uppercase py-2 rounded-lg transition">Segna Come Completato</button>
-                    <div id="feedbackForm_${id}" class="hidden mt-3 space-y-2">
-                      <textarea id="feedbackText_${id}" rows="2" placeholder="Inserisci ritmi e sensazioni (RPE 1-10)..." class="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-brand-neon"></textarea>
-                      <button onclick="submitFeedback('${id}')" class="w-full bg-brand-neon text-black font-black uppercase text-xs py-2 rounded-lg">Invia a Coach</button>
-                    </div>
-                  </div>
-                ` : `<div class="p-2.5 bg-green-950/20 rounded-lg border border-green-900/30 text-xs"><span class="text-[10px] font-bold text-green-400 block">Resoconto inviato:</span><p>${d.feedback}</p></div>`}
-              </div>
-            `;
-          });
-
-          html += `
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-      });
-    }
-
-    window.toggleFeedbackForm = function(id) {
-      const el = document.getElementById(`feedbackForm_${id}`);
-      if (el) el.classList.toggle('hidden');
-    };
-
-    window.submitFeedback = async function(id) {
-      const textEl = document.getElementById(`feedbackText_${id}`);
-      const text = textEl ? textEl.value.trim() : '';
-      if (!text) return alert("Inserisci un breve resoconto prima di confermare!");
-      try {
-        await db.collection('workouts').doc(id).update({ status: 'completed', feedback: text });
-        alert('Allenamento completato con successo!');
-      } catch (err) {
-        alert("Errore: " + err.message);
-      }
-    };
-  </script>
-</body>
-</html>
+      document.getElementById('raceNotes
